@@ -4,8 +4,8 @@ import json
 from flask import Flask
 from jinja2 import Template
 
+from plotter import Plotter
 from bokeh.embed import json_item
-from bokeh.plotting import figure
 from bokeh.resources import CDN
 
 app = Flask(__name__)
@@ -42,7 +42,9 @@ def root():
 
 @app.route('/mainplot')
 def plot():
-    p = make_plot()
+    # p = make_plot()
+    plotter = Plotter()
+    p = plotter.plot_BC_cases()
     return json.dumps(json_item(p, "mainplot"))
 
 if __name__ == '__main__':

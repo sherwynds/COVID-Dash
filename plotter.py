@@ -2,19 +2,33 @@ import json
 import requests
 import pandas as pd
 from pandas import json_normalize
+import numpy as np
+import bokeh
+from bokeh.plotting import figure
+
 
 class Plotter:
 
-    raw_data = pd.DataFrame()
-    BC_cases = pd.DataFrame()
-    ON_cases = pd.DataFrame()
+    BC = pd.DataFrame()
 
     def __init__(self):
-        self.raw_data = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
-        self.raw_data = self.raw_data.groupby(['Province'])
-        self.BC_cases = self.raw_data.get_group("British Columbia")
-
-
-
-p = Plotter()
-print(p.BC_cases.head())
+        result = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
+        result = result.groupby(['Province'])
+        self.BC = result.get_group("British Columbia")
+        self.BC = self.BC[['Date', 'Cases']]
+        self.BC[['DailyCases']] = self.BC[['Cases']].diff()
+        bc_index = np.arange(0, len(self.BC.index))        
+        self.BC.set_index(bc_index, inplace=True)
+        self.BC.at[0, 'DailyCases'] = self.BC.at[0, 'Cases']
+        (self.BC)['Date'] = (self.BC)['Date'].apply(lambda x: x[0:10])
+        (self.BC)['Date'] = pd.to_datetime((self.BC)['Date'])
+    
+    def plot_BC_cases(self):
+        p = figure(title="BC Test Plot", x_axis_type='datetime', plot_height=700, plot_width=1400)
+        x = self.BC['Date']
+        y = self.BC['DailyCases']
+        print(x)
+        print(y)
+        p.line(x,y)
+        return p
+        
