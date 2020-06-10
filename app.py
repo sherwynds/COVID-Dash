@@ -45,7 +45,8 @@ def root():
 def plot():
     # p = make_plot()
     plotter = Plotter()
-    p = plotter.plot_BC_cases()
+    # p = plotter.plot_BC_cases()
+    p = plotter.plot_cases()
     return json.dumps(json_item(p, "mainplot"))
 
 if __name__ == '__main__':

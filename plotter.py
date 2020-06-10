@@ -5,11 +5,12 @@ from pandas import json_normalize
 import numpy as np
 import bokeh
 from bokeh.plotting import figure
-
+from bokeh.models import HoverTool, ColumnDataSource
 
 class Plotter:
 
     BC = pd.DataFrame()
+    colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
 
     data = {
         'British Columbia': pd.DataFrame(),
@@ -24,7 +25,7 @@ class Plotter:
         'New Brunswick': pd.DataFrame(),
         'Yukon': pd.DataFrame(),
         'Northwest Territories': pd.DataFrame(),
-        'Nunavut': pd.DataFrame(),
+        #'Nunavut': pd.DataFrame(), TODO: Handle Nunavut
     }
 
 
@@ -62,16 +63,34 @@ class Plotter:
             print(prov)
             length = len(self.data[prov].index)
             print(self.data[prov].head(length))
-                
-
-
+            print(self.data[prov]['Date'].dtype)
     
+    def plot_cases(self):
+        p = figure(title="COVID Daily Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='New Cases')
+        for data, name, color in zip(self.data.values(), self.data.keys(), self.colors):
+            source = ColumnDataSource(data={
+                'Date': data['Date'],
+                'DailyCases': data['DailyCases']
+            })
+            p.line(x='Date', y='DailyCases', line_width=2, color=color, alpha=0.8, legend_label=name, source=source)
+        p.legend.location='top_left'
+        p.add_tools(HoverTool(
+            tooltips=[
+                ('Date', '@Date{%F}'),
+                ('New Cases', '@DailyCases{0}'),
+            ],
+
+            formatters={
+                '@Date': 'datetime',
+                'DailyCases': 'printf',
+            }
+        ))
+        return p
+
     def plot_BC_cases(self):
         p = figure(title="BC Test Plot", x_axis_type='datetime', plot_height=700, plot_width=1400)
         x = self.BC['Date']
         y = self.BC['DailyCases']
-        print(x)
-        print(y)
         p.line(x,y)
         return p
         
