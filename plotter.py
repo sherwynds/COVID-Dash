@@ -9,8 +9,8 @@ from bokeh.models import HoverTool, ColumnDataSource
 
 class Plotter:
 
-    BC = pd.DataFrame()
-    colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
+    # colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
+    colors = ["#824737", "#67923D", "#D6562B", "#007042", "#F09B36", "#74CCE5", "#F4BB3A", "#00BBD6", "#ABC178", "#C6A9B5", "#9C8156", "#895881", "#BC9F77"]
 
     data = {
         'British Columbia': pd.DataFrame(),
@@ -31,20 +31,12 @@ class Plotter:
 
     def __init__(self):
         self.get_data()
-        result = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
-        result = result.groupby(['Province'])
-        self.BC = result.get_group("British Columbia")
-        self.BC = self.BC[['Date', 'Cases']]
-        self.BC[['DailyCases']] = self.BC[['Cases']].diff()
-        bc_index = np.arange(0, len(self.BC.index))        
-        self.BC.set_index(bc_index, inplace=True)
-        self.BC.at[0, 'DailyCases'] = self.BC.at[0, 'Cases']
-        (self.BC)['Date'] = (self.BC)['Date'].apply(lambda x: x[0:10])
-        (self.BC)['Date'] = pd.to_datetime((self.BC)['Date'])
     
     def get_data(self):
         cases = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
         cases = cases.groupby(['Province'])
+
+        # Add and organize the data into dataframes with Dates, Cases, DailyCases, TODO Deaths, DailyDeaths
         for prov in self.data:
             if prov not in cases.groups:
                 # TODO: handle this functionality here
@@ -59,38 +51,40 @@ class Plotter:
                 df['Date'] = df['Date'].apply(lambda x: x[0:10])
                 df['Date'] = pd.to_datetime(df['Date'])
                 self.data[prov] = df
+
+        # Print DataFrame to console for debugging
         for prov in self.data:
             print(prov)
-            length = len(self.data[prov].index)
-            print(self.data[prov].head(length))
-            print(self.data[prov]['Date'].dtype)
+            print(self.data[prov])
     
+    # Plot new cases per day by province
     def plot_cases(self):
-        p = figure(title="COVID Daily Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='New Cases')
+
+        p = figure(title="COVID Daily Active Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='Active Cases')
+        
         for data, name, color in zip(self.data.values(), self.data.keys(), self.colors):
+            size = len(data)
+            names = [name for x in range(size)]             # Create names for tooltips
             source = ColumnDataSource(data={
                 'Date': data['Date'],
-                'DailyCases': data['DailyCases']
+                'ActiveCases': data['DailyCases'],
+                'Province': names,
             })
-            p.line(x='Date', y='DailyCases', line_width=2, color=color, alpha=0.8, legend_label=name, source=source)
+            p.line(x='Date', y='ActiveCases', line_width=2, color=color, alpha=0.9, legend_label=name, source=source)
         p.legend.location='top_left'
+        
+        # Add hover information
         p.add_tools(HoverTool(
             tooltips=[
+                ('Province', '@Province'),
+                ('Active Cases', '@ActiveCases{0}'),
                 ('Date', '@Date{%F}'),
-                ('New Cases', '@DailyCases{0}'),
             ],
-
             formatters={
                 '@Date': 'datetime',
-                'DailyCases': 'printf',
+                'ActiveCases': 'printf',
             }
         ))
         return p
 
-    def plot_BC_cases(self):
-        p = figure(title="BC Test Plot", x_axis_type='datetime', plot_height=700, plot_width=1400)
-        x = self.BC['Date']
-        y = self.BC['DailyCases']
-        p.line(x,y)
-        return p
-        
+    # End Code

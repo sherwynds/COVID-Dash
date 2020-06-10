@@ -11,17 +11,18 @@ from bokeh.resources import CDN
 
 app = Flask(__name__)
 
-
+# Basic webpage
 page = Template("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
   {{ resources }}
-  <title> COVID-19 Dashboard </title>
-  <h1> COVID-19 Dashboard </h1>
+  <title> Canadian COVID Dashboard </title>
+  <h1> Canada COVID Case Tracker </h1>
 </head>
 <body>
   <div id="mainplot"></div>
+  <div> Note: Nunavut is not included because it has no confirmed cases. Data sourced from https://api.covid19api.com/. </div>
   <script>
   fetch('/mainplot')
     .then(function(response) { return response.json(); })
@@ -30,22 +31,14 @@ page = Template("""
 </body>
 """)
 
-def make_plot():
-    p = figure(title = "Canada COVID Information")
-    x = [1,2,3,4,5,6,7,8,9,10]
-    y = [1,4,9,16,25,36,49,64,81,100]
-    p.line(x, y)
-    return p
-
 @app.route('/')
 def root():
     return page.render(resources=CDN.render())
 
+# Plots the main chart comparing new covid cases
 @app.route('/mainplot')
 def plot():
-    # p = make_plot()
     plotter = Plotter()
-    # p = plotter.plot_BC_cases()
     p = plotter.plot_cases()
     return json.dumps(json_item(p, "mainplot"))
 
