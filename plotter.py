@@ -10,9 +10,10 @@ from bokeh.models import HoverTool, ColumnDataSource
 class Plotter:
 
     # colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
-    colors = ["#824737", "#67923D", "#D6562B", "#007042", "#F09B36", "#74CCE5", "#F4BB3A", "#00BBD6", "#ABC178", "#C6A9B5", "#9C8156", "#895881", "#BC9F77"]
+    colors = ["#000000", "#824737", "#67923D", "#D6562B", "#007042", "#F09B36", "#74CCE5", "#F4BB3A", "#00BBD6", "#ABC178", "#C6A9B5", "#9C8156", "#895881", "#BC9F77"]
 
     data = {
+        'All': pd.DataFrame(),
         'British Columbia': pd.DataFrame(),
         'Alberta': pd.DataFrame(),
         'Saskatchewan': pd.DataFrame(),
@@ -35,14 +36,46 @@ class Plotter:
     def get_data(self):
         cases = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
         cases = cases.groupby(['Province'])
+        # recovered = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/recovered", headers={}, data={})).json())
+        # recovered = recovered.groupby(['Province'])
+        # deaths = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/deaths", headers={}, data={})).json())
+        # deaths = deaths.groupby(['Province'])
 
-        # Add and organize the data into dataframes with Dates, Cases, DailyCases, TODO Deaths, DailyDeaths
+        # TODO: Fix this code
+        # for prov in self.data:
+        #     if prov not in cases.groups:
+        #         pass
+        #     else:
+        #         df = cases.get_group(prov)
+        #         recovered_df = recovered.get_group(prov)
+        #         deaths_df = deaths.get_group(prov)
+        #         index=np.arange(0, len(df.index))
+        #         df.set_index(index, inplace=True)
+        #         recovered_df.set_index(index, inplace=True)
+        #         deaths_df.set_index(index, inplace=True)
+
+        #         df = df[['Date','Cases']]
+        #         # print(prov)
+        #         # print(df.tail())
+
+        #         df['Recovered'] = recovered_df['Cases']
+        #         df['Deaths'] = deaths_df['Cases']
+
+        #         df['Date'] = df['Date'].apply(lambda x: x[0:10])
+        #         df['Date'] = pd.to_datetime(df['Date'])
+
+        #         # print(df.tail())
+        #         df['DailyCases'] = (df['Cases'] - df['Recovered'] - df['Deaths'])
+        #         self.data[prov] = df
+
         for prov in self.data:
-            if prov not in cases.groups:
-                # TODO: handle this functionality here
+            if prov != "All" and prov not in cases.groups:
                 pass
             else:
-                df = cases.get_group(prov)
+                if prov == "All":
+                    df = cases.get_group("")
+                else:
+                    df = cases.get_group(prov)
                 df = df[['Date', 'Cases']]
                 index = np.arange(0, len(df.index))
                 df.set_index(index, inplace=True)
@@ -60,29 +93,32 @@ class Plotter:
     # Plot new cases per day by province
     def plot_cases(self):
 
-        p = figure(title="COVID Daily Active Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='Active Cases')
+        p = figure(title="Daily Increase in COVID-19 Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='Increase in Cases')
         
         for data, name, color in zip(self.data.values(), self.data.keys(), self.colors):
             size = len(data)
             names = [name for x in range(size)]             # Create names for tooltips
             source = ColumnDataSource(data={
                 'Date': data['Date'],
-                'ActiveCases': data['DailyCases'],
+                'CaseIncrease': data['DailyCases'],
                 'Province': names,
             })
-            p.line(x='Date', y='ActiveCases', line_width=2, color=color, alpha=0.9, legend_label=name, source=source)
+            if name == "All":
+                p.line(x='Date', y='CaseIncrease', line_width=4, color=color, alpha=0.4, legend_label=name, source=source)
+            else:
+                p.line(x='Date', y='CaseIncrease', line_width=2, color=color, alpha=0.9, legend_label=name, source=source)
         p.legend.location='top_left'
         
         # Add hover information
         p.add_tools(HoverTool(
             tooltips=[
                 ('Province', '@Province'),
-                ('Active Cases', '@ActiveCases{0}'),
+                ('Increase', '@CaseIncrease{0}'),
                 ('Date', '@Date{%F}'),
             ],
             formatters={
                 '@Date': 'datetime',
-                'ActiveCases': 'printf',
+                'CaseIncrease': 'printf',
             }
         ))
         return p
