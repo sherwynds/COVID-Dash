@@ -5,4 +5,4 @@ Our lives have been structurally and materially altered by the global pandemic i
 
 Check out the link to the live web app, or clone this repository, run `pip install -r requirements.txt` and then `flask run`.
 
-Special thanks to Michell Illing for curating the color palette.
+Special thanks to Michelle Illing for curating the color palette.
