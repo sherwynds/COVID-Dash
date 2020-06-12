@@ -5,12 +5,13 @@ from pandas import json_normalize
 import numpy as np
 import bokeh
 from bokeh.plotting import figure
-from bokeh.models import HoverTool, ColumnDataSource
+from bokeh.models import HoverTool, ColumnDataSource, CrosshairTool
 
 class Plotter:
 
     # colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
     colors = ["#000000", "#824737", "#67923D", "#D6562B", "#007042", "#F09B36", "#74CCE5", "#F4BB3A", "#00BBD6", "#ABC178", "#C6A9B5", "#9C8156", "#895881", "#BC9F77"]
+    prov_colors = ["#824737", "#67923D", "#D6562B"]
 
     data = {
         'All': pd.DataFrame(),
@@ -38,8 +39,8 @@ class Plotter:
         cases = cases.groupby(['Province'])
         # recovered = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/recovered", headers={}, data={})).json())
         # recovered = recovered.groupby(['Province'])
-        # deaths = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/deaths", headers={}, data={})).json())
-        # deaths = deaths.groupby(['Province'])
+        deaths = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/deaths", headers={}, data={})).json())
+        deaths = deaths.groupby(['Province'])
 
         # TODO: Fix this code
         # for prov in self.data:
@@ -74,11 +75,15 @@ class Plotter:
             else:
                 if prov == "All":
                     df = cases.get_group("")
+                    deaths_df = deaths.get_group("")
                 else:
                     df = cases.get_group(prov)
+                    deaths_df = deaths.get_group(prov)
                 df = df[['Date', 'Cases']]
                 index = np.arange(0, len(df.index))
                 df.set_index(index, inplace=True)
+                deaths_df.set_index(index, inplace=True)
+                df['Deaths'] = deaths_df['Cases']
                 df[['DailyCases']] = df[['Cases']].diff()
                 df.at[0, 'DailyCases'] = df.at[0, 'Cases']
                 df['Date'] = df['Date'].apply(lambda x: x[0:10])
@@ -93,7 +98,7 @@ class Plotter:
     # Plot new cases per day by province
     def plot_cases(self):
 
-        p = figure(title="Daily Increase in COVID-19 Cases by Province", x_axis_type='datetime', plot_height=700, plot_width=1400, x_axis_label='Date', y_axis_label='Increase in Cases')
+        p = figure(title="Daily Increase in COVID-19 Cases by Province", x_axis_type='datetime', plot_height=600, plot_width=1600, x_axis_label='Date', y_axis_label='Increase in Cases')
         
         for data, name, color in zip(self.data.values(), self.data.keys(), self.colors):
             size = len(data)
@@ -121,6 +126,28 @@ class Plotter:
                 'CaseIncrease': 'printf',
             }
         ))
+
+        p.add_tools(CrosshairTool())
+
         return p
 
+    def plot_province(self, prov):
+        p = figure(title=(f"{prov} COVID-19 Data"), x_axis_type='datetime', x_axis_label='Date', y_axis_label='Cases, Deaths, Daily Increase', plot_height=300, plot_width=1600)
+        df = self.data[prov]
+        source = ColumnDataSource(data={
+            'Date': df['Date'],
+            'Cases': df['Cases'],
+            'Deaths': df['Deaths'],
+            'CaseIncrease': df['DailyCases']
+        })
+        if prov == "All":
+            pass
+        else:
+            p.line(x='Date', y='Cases', line_width=4, color=self.prov_colors[0], alpha=0.7, legend_label='Cases', source=source)
+            p.line(x='Date', y='Deaths', line_width=4, color=self.prov_colors[1], alpha=0.7, legend_label='Deaths', source=source)
+            p.line(x='Date', y='CaseIncrease', line_width=4, color=self.prov_colors[2], alpha=0.7, legend_label='Daily Case Increase', source=source)
+            p.legend.location='top_left'
+
+        return(p)
+        
     # End Code
