@@ -98,7 +98,7 @@ class Plotter:
     # Plot new cases per day by province
     def plot_cases(self):
 
-        p = figure(title="Daily Increase in COVID-19 Cases by Province", x_axis_type='datetime', plot_height=600, plot_width=1600, x_axis_label='Date', y_axis_label='Increase in Cases')
+        p = figure(title="Daily Increase in COVID-19 Cases by Province", x_axis_type='datetime', plot_height=500, plot_width=1600, sizing_mode='stretch_width', x_axis_label='Date', y_axis_label='Increase in Cases')
         
         for data, name, color in zip(self.data.values(), self.data.keys(), self.colors):
             size = len(data)
@@ -132,7 +132,7 @@ class Plotter:
         return p
 
     def plot_province(self, prov):
-        p = figure(title=(f"{prov} COVID-19 Data"), x_axis_type='datetime', x_axis_label='Date', y_axis_label='Cases, Deaths, Daily Increase', plot_height=300, plot_width=1600)
+        p = figure(title=(f"{prov} COVID-19 Data"), x_axis_type='datetime', plot_height=250, plot_width=300, sizing_mode='stretch_width')
         df = self.data[prov]
         source = ColumnDataSource(data={
             'Date': df['Date'],

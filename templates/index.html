@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.2.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.2.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.2.min.js"
+        crossorigin="anonymous"></script>
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <style>
+    /* .leftcol {
+      float: left;
+      width: 10%;
+    } */
+
+    .midcol{
+      width: 99%;
+      align-content: center;
+      align-items: center;
+    }
+
+    /* .maincol{
+      max-width: fit-content;
+      align-items: center;
+      align-self: center;
+    } */
+
+    /* .rightcol{
+      float: left;
+      width: 10%;
+    } */
+
+  .column {
+    float: left;
+    padding: 1%;
+    width: 31%;
+  }
+  
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  </style>
+  <title> Canadian COVID Dashboard </title>
+  <h1> Canada COVID Case Tracker </h1>
+</head>
+<body>
+  <div class="midcol">
+    <div class="maincol" id="mainplot"></div>
+  </div>
+  <div> Note: Nunavut is not included because it has no confirmed cases. Data sourced from https://api.covid19api.com/. </div>
+  <div class="row">
+    <div class="column">
+      <div id="bc">British Columbia</div>
+    </div>
+    <div class="column">
+      <div id="ab">Alberta</div>
+    </div>
+    <div class="column">
+      <div id="on">Ontario</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column">
+      <div id="sk">Saskatchewan</div>
+    </div>
+    <div class="column">
+      <div id="mb">Manitoba</div>
+    </div>
+    <div class="column">
+      <div id="qc">Quebec</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column">
+      <div id="ns">Nova Scotia</div>
+    </div>
+    <div class="column">
+      <div id="nb">New Brunswick</div>
+    </div>
+    <div class="column">
+      <div id="nl">Newfoundland and Labrador</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column">
+      <div id="yt">Yukon</div>
+    </div>
+    <div class="column">
+      <div id="nt">Northwest Territories</div>
+    </div>
+    <div class="column">
+      <div id="pe">Prince Edward Island</div>
+    </div>
+  </div>
+  
+  <!-- <div id="qc">Quebec</div> -->
+  <script>
+  fetch('/mainplot')
+    .then(function(response) { return response.json(); })
+    .then(function(item) { return Bokeh.embed.embed_item(item); })
+  </script>
+  <script>
+  fetch('/bc')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/ab')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/on')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/sk')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/mb')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/qc')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/ns')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/nb')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/nl')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/yt')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/nt')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+  <script>
+    fetch('/pe')
+    .then(function(response) {return response.json();})
+    .then(function(item) {return Bokeh.embed.embed_item(item);})
+  </script>
+</body>
+</html>

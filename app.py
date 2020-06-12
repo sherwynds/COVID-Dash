@@ -2,7 +2,7 @@ import json
 import gunicorn
 
 
-from flask import Flask
+from flask import Flask, render_template
 from jinja2 import Template
 
 from plotter import Plotter
@@ -18,6 +18,7 @@ page = Template("""
 <html lang="en">
 <head>
   {{ resources }}
+  <link rel="stylesheet" href="styles.css">
   <title> Canadian COVID Dashboard </title>
   <h1> Canada COVID Case Tracker </h1>
 </head>
@@ -26,24 +27,16 @@ page = Template("""
   <div> Note: Nunavut is not included because it has no confirmed cases. Data sourced from https://api.covid19api.com/. </div>
   <div class="row">
     <div class="column">
-      <div id="yt"></div>
-      <div id="bc"></div>
-      <div id="nt"></div>
-      <div id="ab"></div>
+      <div id="bc">British Columbia</div>
     </div>
     <div class="column">
-      <div id="sk"></div>
-      <div id="mb"></div>
-      <div id="on"></div>
-      <div id="qc"></div>
+      <div id="ab">Alberta</div>
     </div>
     <div class="column">
-      <div id="nl"></div>
-      <div id="nb"></div>
-      <div id="pe"></div>
-      <div id="ns"></div>
+      <div id="on">Ontario</div>
     </div>
   </div>
+  <div id="qc">Quebec</div>
   <script>
   fetch('/mainplot')
     .then(function(response) { return response.json(); })
@@ -74,7 +67,8 @@ page = Template("""
 
 @app.route('/')
 def root():
-    return page.render(resources=CDN.render())
+  return render_template("index.html")
+    #return page.render(resources=CDN.render())
 
 # Plots the main chart comparing new covid cases
 @app.route('/mainplot')
@@ -97,10 +91,51 @@ def on_plot():
   p = plotter.plot_province("Ontario")
   return json.dumps(json_item(p, "on"))
 
+@app.route('/sk')
+def sk_plot():
+  p = plotter.plot_province("Saskatchewan")
+  return json.dumps(json_item(p, "sk"))
+
+@app.route('/mb')
+def mb_plot():
+  p = plotter.plot_province("Manitoba")
+  return json.dumps(json_item(p, "mb"))
+
 @app.route('/qc')
 def qc_plot():
   p = plotter.plot_province("Quebec")
   return json.dumps(json_item(p, "qc"))
+
+
+@app.route('/ns')
+def ns_plot():
+  p = plotter.plot_province("Nova Scotia")
+  return json.dumps(json_item(p, "ns"))
+
+@app.route('/nb')
+def nb_plot():
+  p = plotter.plot_province("New Brunswick")
+  return json.dumps(json_item(p, "nb"))
+
+@app.route('/nl')
+def nl_plot():
+  p = plotter.plot_province("Newfoundland and Labrador")
+  return json.dumps(json_item(p, "nl"))
+
+@app.route('/yt')
+def yt_plot():
+  p = plotter.plot_province("Yukon")
+  return json.dumps(json_item(p, "yt"))
+
+@app.route('/nt')
+def nt_plot():
+  p = plotter.plot_province("Northwest Territories")
+  return json.dumps(json_item(p, "nt"))
+
+@app.route('/pe')
+def pe_plot():
+  p = plotter.plot_province("Prince Edward Island")
+  return json.dumps(json_item(p, "pe"))
 
 if __name__ == '__main__':
     app.run()
