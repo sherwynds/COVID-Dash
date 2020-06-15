@@ -113,6 +113,7 @@ class Plotter:
             else:
                 p.line(x='Date', y='CaseIncrease', line_width=2, color=color, alpha=0.9, legend_label=name, source=source)
         p.legend.location='top_left'
+        p.legend.click_policy='hide'
         
         # Add hover information
         p.add_tools(HoverTool(
@@ -147,6 +148,7 @@ class Plotter:
             p.line(x='Date', y='Deaths', line_width=4, color=self.prov_colors[1], alpha=0.7, legend_label='Deaths', source=source)
             p.line(x='Date', y='CaseIncrease', line_width=4, color=self.prov_colors[2], alpha=0.7, legend_label='Daily Case Increase', source=source)
             p.legend.location='center_right'
+
 
         return(p)
         
