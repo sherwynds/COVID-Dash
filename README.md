@@ -8,3 +8,5 @@ Our lives have been structurally and materially altered by the global pandemic i
 Check out the link to the live web app, or clone this repository, run `pip install -r requirements.txt` and then `flask run`.
 
 Special thanks to Michelle Illing for curating the color palette.
+
+**Note:** Please be aware that the website might take long to load on Heroku because Heroku automatically puts the web app to sleep. It will load much faster if run locally.
