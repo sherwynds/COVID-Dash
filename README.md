@@ -9,4 +9,4 @@ Check out the link to the live web app, or clone this repository, run `pip insta
 
 Special thanks to Michelle Illing for curating the color palette.
 
-**Note:** Please be aware that the website might take long to load on Heroku because it puts the web app to sleep when not in use. It will load much faster locally.
+**Note:** The website might take long to load on Heroku because it puts the web app to sleep when not in use. It will load much faster locally.
