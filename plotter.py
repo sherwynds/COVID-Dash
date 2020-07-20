@@ -14,7 +14,7 @@ class Plotter:
     prov_colors = ["#824737", "#67923D", "#D6562B"]
 
     data = {
-        'All': pd.DataFrame(),
+        # 'All': pd.DataFrame(), TODO: Implement aggregate calculation for all provinces as it has been deprecated from the API
         'British Columbia': pd.DataFrame(),
         'Alberta': pd.DataFrame(),
         'Saskatchewan': pd.DataFrame(),
@@ -27,7 +27,7 @@ class Plotter:
         'New Brunswick': pd.DataFrame(),
         'Yukon': pd.DataFrame(),
         'Northwest Territories': pd.DataFrame(),
-        #'Nunavut': pd.DataFrame(), TODO: Handle Nunavut
+        # 'Nunavut': pd.DataFrame(), TODO: Handle Nunavut
     }
 
 
@@ -37,10 +37,10 @@ class Plotter:
     def get_data(self):
         cases = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/confirmed", headers={}, data={})).json())
         cases = cases.groupby(['Province'])
-        # recovered = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/recovered", headers={}, data={})).json())
-        # recovered = recovered.groupby(['Province'])
         deaths = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/deaths", headers={}, data={})).json())
         deaths = deaths.groupby(['Province'])
+        # recovered = json_normalize((requests.request("GET", "https://api.covid19api.com/dayone/country/Canada/status/recovered", headers={}, data={})).json())
+        # recovered = recovered.groupby(['Province'])
 
         # TODO: Fix this code
         # for prov in self.data:
@@ -73,12 +73,16 @@ class Plotter:
             if prov != "All" and prov not in cases.groups:
                 pass
             else:
-                if prov == "All":
-                    df = cases.get_group("")
-                    deaths_df = deaths.get_group("")
-                else:
-                    df = cases.get_group(prov)
-                    deaths_df = deaths.get_group(prov)
+            # TODO: Implement aggregate calculation for all provinces as it has been deprecated from the API
+            #     if prov == "All":
+            #         df = cases.get_group("")
+            #         deaths_df = deaths.get_group("")
+            #         pass
+            #     else:
+            #         df = cases.get_group(prov)
+            #         deaths_df = deaths.get_group(prov)
+                df = cases.get_group(prov)
+                deaths_df = deaths.get_group(prov)
                 df = df[['Date', 'Cases']]
                 index = np.arange(0, len(df.index))
                 df.set_index(index, inplace=True)
@@ -109,7 +113,9 @@ class Plotter:
                 'Province': names,
             })
             if name == "All":
-                p.line(x='Date', y='CaseIncrease', line_width=4, color=color, alpha=0.4, legend_label=name, source=source)
+                # TODO: Implement aggregate calculation for all provinces as it has been deprecated from the API
+                # p.line(x='Date', y='CaseIncrease', line_width=4, color=color, alpha=0.4, legend_label=name, source=source)
+                pass
             else:
                 p.line(x='Date', y='CaseIncrease', line_width=2, color=color, alpha=0.9, legend_label=name, source=source)
         p.legend.location='top_left'
