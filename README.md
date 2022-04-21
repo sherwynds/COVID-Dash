@@ -1,7 +1,7 @@
 # COVID-Dash
 📉 Interactive Flask/Bokeh dashboard for COVID-19 data in Canada: [covid-can-dash.herokuapp.com](http://covid-can-dash.herokuapp.com/)
-
-**IMPORTANT NOTE:** The website might take long to load on Heroku because it puts the web app to sleep when not in use. It will load much faster locally. **It is also a WIP that needs to be updated following changes to its dependencies, so graphs might not display correctly right now.**
+The website might take long to load on Heroku because it puts the web app to sleep when not in use. It will load much faster locally. 
+**IMPORTANT NOTE: The above link will not display graphs correctly right now, as the code needs to be updated follwoing changes to the upstream API it depends on.**
 
 ![image](https://user-images.githubusercontent.com/4008778/84304791-e994f780-ab0d-11ea-87f2-4080d0f1be76.PNG)
 
